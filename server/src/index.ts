@@ -1,6 +1,9 @@
 import { app } from "./app.ts";
+import { initializeDatabase } from "./database/database.ts";
 
 const port = Number(process.env.PORT) || 3001;
+
+initializeDatabase();
 
 app.listen(port, () => {
   console.log(`API server is running on http://localhost:${port}`);
