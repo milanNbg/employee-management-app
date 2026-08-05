@@ -1,4 +1,5 @@
 import express from "express";
+import { employeeRouter } from "./features/employees/employee.routes.ts";
 
 export const app = express();
 
@@ -10,3 +11,5 @@ app.get("/api/health", (_request, response) => {
     message: "Employee Management API is running.",
   });
 });
+
+app.use("/api/employees", employeeRouter);
