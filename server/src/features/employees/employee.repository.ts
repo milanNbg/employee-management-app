@@ -1,7 +1,9 @@
+import { randomUUID } from "node:crypto";
 import { database } from "../../database/database.ts";
 import {
   employeeRowSchema,
   employeeRowsSchema,
+  type CreateEmployeeInput,
   type EmployeeRow,
 } from "./employee.schemas.ts";
 import type { Employee } from "./employee.types.ts";
@@ -55,4 +57,39 @@ export function findEmployeeById(id: string): Employee | null {
   }
 
   return mapEmployeeRow(employeeRowSchema.parse(row));
+}
+
+export function createEmployee(input: CreateEmployeeInput): Employee {
+  const id = randomUUID();
+  const timestamp = new Date().toISOString();
+
+  const statement = database.prepare(`
+    INSERT INTO employees (
+      id,
+      first_name,
+      last_name,
+      salary,
+      created_at,
+      updated_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  statement.run(
+    id,
+    input.firstName,
+    input.lastName,
+    input.salary,
+    timestamp,
+    timestamp,
+  );
+
+  return {
+    id,
+    firstName: input.firstName,
+    lastName: input.lastName,
+    salary: input.salary,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
 }

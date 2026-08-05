@@ -11,4 +11,24 @@ export const employeeRowSchema = z.object({
 
 export const employeeRowsSchema = z.array(employeeRowSchema);
 
+export const createEmployeeSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(2, "First name must contain at least 2 characters.")
+    .max(50, "First name must contain at most 50 characters."),
+  lastName: z
+    .string()
+    .trim()
+    .min(2, "Last name must contain at least 2 characters.")
+    .max(50, "Last name must contain at most 50 characters."),
+  salary: z
+    .number()
+    .int("Salary must be a whole number.")
+    .nonnegative("Salary cannot be negative.")
+    .max(10_000_000, "Salary exceeds the allowed maximum."),
+});
+
 export type EmployeeRow = z.infer<typeof employeeRowSchema>;
+
+export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
