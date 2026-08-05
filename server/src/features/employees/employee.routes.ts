@@ -3,8 +3,12 @@ import {
   createEmployee,
   findAllEmployees,
   findEmployeeById,
+  updateEmployeeSalary,
 } from "./employee.repository.ts";
-import { createEmployeeSchema } from "./employee.schemas.ts";
+import {
+  createEmployeeSchema,
+  updateEmployeeSalarySchema,
+} from "./employee.schemas.ts";
 
 export const employeeRouter = Router();
 
@@ -38,6 +42,43 @@ employeeRouter.post("/", (request, response) => {
     .status(201)
     .set("Location", `/api/employees/${employee.id}`)
     .json(employee);
+});
+
+employeeRouter.patch("/:id/salary", (request, response) => {
+  const validationResult = updateEmployeeSalarySchema.safeParse(request.body);
+
+  if (!validationResult.success) {
+    response.status(400).json({
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "The provided salary is invalid.",
+        details: validationResult.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+        })),
+      },
+    });
+
+    return;
+  }
+
+  const employee = updateEmployeeSalary(
+    request.params.id,
+    validationResult.data,
+  );
+
+  if (!employee) {
+    response.status(404).json({
+      error: {
+        code: "EMPLOYEE_NOT_FOUND",
+        message: "Employee was not found.",
+      },
+    });
+
+    return;
+  }
+
+  response.status(200).json(employee);
 });
 
 employeeRouter.get("/:id", (request, response) => {

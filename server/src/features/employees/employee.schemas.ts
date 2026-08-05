@@ -29,6 +29,18 @@ export const createEmployeeSchema = z.object({
     .max(10_000_000, "Salary exceeds the allowed maximum."),
 });
 
+export const updateEmployeeSalarySchema = z.object({
+  salary: z
+    .number()
+    .int("Salary must be a whole number.")
+    .nonnegative("Salary cannot be negative.")
+    .max(10_000_000, "Salary exceeds the allowed maximum."),
+});
+
 export type EmployeeRow = z.infer<typeof employeeRowSchema>;
 
 export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
+
+export type UpdateEmployeeSalaryInput = z.infer<
+  typeof updateEmployeeSalarySchema
+>;

@@ -5,6 +5,7 @@ import {
   employeeRowsSchema,
   type CreateEmployeeInput,
   type EmployeeRow,
+  type UpdateEmployeeSalaryInput,
 } from "./employee.schemas.ts";
 import type { Employee } from "./employee.types.ts";
 
@@ -92,4 +93,27 @@ export function createEmployee(input: CreateEmployeeInput): Employee {
     createdAt: timestamp,
     updatedAt: timestamp,
   };
+}
+
+export function updateEmployeeSalary(
+  id: string,
+  input: UpdateEmployeeSalaryInput,
+): Employee | null {
+  const updatedAt = new Date().toISOString();
+
+  const statement = database.prepare(`
+    UPDATE employees
+    SET
+      salary = ?,
+      updated_at = ?
+    WHERE id = ?
+  `);
+
+  const result = statement.run(input.salary, updatedAt, id);
+
+  if (Number(result.changes) === 0) {
+    return null;
+  }
+
+  return findEmployeeById(id);
 }
