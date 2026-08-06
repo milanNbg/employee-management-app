@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getEmployees } from '../api/employeeApi'
 import type { Employee } from '../types/employee'
 
@@ -6,6 +6,7 @@ interface UseEmployeesResult {
   employees: Employee[]
   isLoading: boolean
   error: string | null
+  refreshEmployees: () => Promise<void>
 }
 
 function isAbortError(error: unknown): boolean {
@@ -25,33 +26,45 @@ export function useEmployees(): UseEmployeesResult {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const refreshEmployees = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const loadedEmployees = await getEmployees()
+      setEmployees(loadedEmployees)
+    } catch (loadError) {
+      if (isAbortError(loadError)) {
+        return
+      }
+
+      setError(getErrorMessage(loadError))
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     const abortController = new AbortController()
 
-    async function loadEmployees() {
-      setIsLoading(true)
-      setError(null)
-
-      try {
-        const loadedEmployees = await getEmployees(abortController.signal)
-
+    getEmployees(abortController.signal)
+      .then((loadedEmployees) => {
         if (!abortController.signal.aborted) {
           setEmployees(loadedEmployees)
         }
-      } catch (loadError) {
+      })
+      .catch((loadError: unknown) => {
         if (isAbortError(loadError) || abortController.signal.aborted) {
           return
         }
 
         setError(getErrorMessage(loadError))
-      } finally {
+      })
+      .finally(() => {
         if (!abortController.signal.aborted) {
           setIsLoading(false)
         }
-      }
-    }
-
-    void loadEmployees()
+      })
 
     return () => {
       abortController.abort()
@@ -62,5 +75,6 @@ export function useEmployees(): UseEmployeesResult {
     employees,
     isLoading,
     error,
+    refreshEmployees,
   }
 }

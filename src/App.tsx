@@ -1,16 +1,72 @@
+import { useState } from 'react'
 import './App.css'
+import { EmployeeFormDialog } from './features/employees/components/EmployeeFormDialog'
 import { EmployeeTable } from './features/employees/components/EmployeeTable'
+import { useCreateEmployee } from './features/employees/hooks/useCreateEmployee'
 import { useEmployees } from './features/employees/hooks/useEmployees'
+import type { CreateEmployeeFormValues } from './features/employees/schemas/employeeSchema'
 
 export function App() {
-  const { employees, isLoading, error } = useEmployees()
+  const [isEmployeeFormVisible, setIsEmployeeFormVisible] = useState(false)
+  const { employees, isLoading, error, refreshEmployees } = useEmployees()
+  const {
+    submitEmployee,
+    isSubmitting,
+    error: createEmployeeError,
+    clearError,
+  } = useCreateEmployee()
+
+  const showEmployeeForm = () => {
+    clearError()
+    setIsEmployeeFormVisible(true)
+  }
+
+  const closeEmployeeForm = () => {
+    if (isSubmitting) {
+      return
+    }
+
+    clearError()
+    setIsEmployeeFormVisible(false)
+  }
+
+  const handleCreateEmployee = async (
+    values: CreateEmployeeFormValues,
+  ) => {
+    if (isSubmitting) {
+      return
+    }
+
+    await submitEmployee(values)
+    await refreshEmployees()
+    closeEmployeeForm()
+  }
 
   return (
     <main className="app">
       <section className="app-header" aria-labelledby="page-title">
-        <h1 id="page-title">Employee Management</h1>
-        <p>Manage employees and record screen walkthroughs.</p>
+        <div>
+          <h1 id="page-title">Employee Management</h1>
+          <p>Manage employees and record screen walkthroughs.</p>
+        </div>
+        <button
+          className="app-add-button"
+          type="button"
+          disabled={isSubmitting || isEmployeeFormVisible}
+          onClick={showEmployeeForm}
+        >
+          Add employee
+        </button>
       </section>
+
+      {isEmployeeFormVisible && (
+        <EmployeeFormDialog
+          onSubmit={handleCreateEmployee}
+          onClose={closeEmployeeForm}
+          isSubmitting={isSubmitting}
+          submissionError={createEmployeeError}
+        />
+      )}
 
       {isLoading && (
         <p className="app-state" role="status" aria-live="polite">
