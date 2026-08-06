@@ -1,41 +1,14 @@
+import { Link } from 'react-router'
+import {
+  formatDate,
+  formatEmployeeName,
+  formatSalary,
+  formatTime,
+} from '../utils/employeeFormatters'
 import type { Employee } from '../types/employee'
 
 interface EmployeeTableProps {
   employees: Employee[]
-}
-
-const salaryFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'EUR',
-  maximumFractionDigits: 0,
-})
-
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-})
-
-const timeFormatter = new Intl.DateTimeFormat('en-US', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-})
-
-function formatEmployeeName(employee: Employee): string {
-  return `${employee.firstName} ${employee.lastName}`
-}
-
-function formatSalary(salary: number): string {
-  return salaryFormatter.format(salary)
-}
-
-function formatDate(date: string): string {
-  return dateFormatter.format(new Date(date))
-}
-
-function formatTime(date: string): string {
-  return timeFormatter.format(new Date(date))
 }
 
 function renderDateTime(date: string) {
@@ -63,7 +36,14 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
           <tbody>
             {employees.map((employee) => (
               <tr key={employee.id}>
-                <th scope="row">{formatEmployeeName(employee)}</th>
+                <th scope="row">
+                  <Link
+                    className="employee-name-link"
+                    to={`/employees/${employee.id}`}
+                  >
+                    {formatEmployeeName(employee)}
+                  </Link>
+                </th>
                 <td>{formatSalary(employee.salary)}</td>
                 <td>{renderDateTime(employee.createdAt)}</td>
                 <td>{renderDateTime(employee.updatedAt)}</td>
@@ -76,7 +56,14 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
       <div className="employee-card-list" aria-label="Employees">
         {employees.map((employee) => (
           <article className="employee-card" key={employee.id}>
-            <h2>{formatEmployeeName(employee)}</h2>
+            <h2>
+              <Link
+                className="employee-name-link"
+                to={`/employees/${employee.id}`}
+              >
+                {formatEmployeeName(employee)}
+              </Link>
+            </h2>
             <dl>
               <div>
                 <dt>Salary</dt>

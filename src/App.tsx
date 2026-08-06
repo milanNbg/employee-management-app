@@ -1,92 +1,19 @@
-import { useState } from 'react'
 import './App.css'
-import { EmployeeFormDialog } from './features/employees/components/EmployeeFormDialog'
-import { EmployeeTable } from './features/employees/components/EmployeeTable'
-import { useCreateEmployee } from './features/employees/hooks/useCreateEmployee'
-import { useEmployees } from './features/employees/hooks/useEmployees'
-import type { CreateEmployeeFormValues } from './features/employees/schemas/employeeSchema'
+import { Navigate, Route, Routes } from 'react-router'
+import { NotFoundPage } from './components/NotFoundPage'
+import { EmployeeDetailsPage } from './features/employees/pages/EmployeeDetailsPage'
+import { EmployeesPage } from './features/employees/pages/EmployeesPage'
 
 export function App() {
-  const [isEmployeeFormVisible, setIsEmployeeFormVisible] = useState(false)
-  const { employees, isLoading, error, refreshEmployees } = useEmployees()
-  const {
-    submitEmployee,
-    isSubmitting,
-    error: createEmployeeError,
-    clearError,
-  } = useCreateEmployee()
-
-  const showEmployeeForm = () => {
-    clearError()
-    setIsEmployeeFormVisible(true)
-  }
-
-  const closeEmployeeForm = () => {
-    if (isSubmitting) {
-      return
-    }
-
-    clearError()
-    setIsEmployeeFormVisible(false)
-  }
-
-  const handleCreateEmployee = async (
-    values: CreateEmployeeFormValues,
-  ) => {
-    if (isSubmitting) {
-      return
-    }
-
-    await submitEmployee(values)
-    await refreshEmployees()
-    closeEmployeeForm()
-  }
-
   return (
-    <main className="app">
-      <section className="app-header" aria-labelledby="page-title">
-        <div>
-          <h1 id="page-title">Employee Management</h1>
-          <p>Manage employees and record screen walkthroughs.</p>
-        </div>
-        <button
-          className="app-add-button"
-          type="button"
-          disabled={isSubmitting || isEmployeeFormVisible}
-          onClick={showEmployeeForm}
-        >
-          Add employee
-        </button>
-      </section>
-
-      {isEmployeeFormVisible && (
-        <EmployeeFormDialog
-          onSubmit={handleCreateEmployee}
-          onClose={closeEmployeeForm}
-          isSubmitting={isSubmitting}
-          submissionError={createEmployeeError}
-        />
-      )}
-
-      {isLoading && (
-        <p className="app-state" role="status" aria-live="polite">
-          Loading employees...
-        </p>
-      )}
-
-      {!isLoading && error && (
-        <p className="app-state app-state-error" role="alert">
-          {error}
-        </p>
-      )}
-
-      {!isLoading && !error && employees.length === 0 && (
-        <p className="app-state">No employees have been added yet.</p>
-      )}
-
-      {!isLoading && !error && employees.length > 0 && (
-        <EmployeeTable employees={employees} />
-      )}
-    </main>
+    <Routes>
+      <Route path="/" element={<Navigate to="/employees" replace />} />
+      <Route path="/employees" element={<EmployeesPage />} />
+      <Route
+        path="/employees/:employeeId"
+        element={<EmployeeDetailsPage />}
+      />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   )
 }
