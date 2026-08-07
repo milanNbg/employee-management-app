@@ -27,6 +27,12 @@
   font-size: 1.05rem;
 }
 
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .app-add-button,
 .app-primary-button,
 .employee-form-actions button {
@@ -63,6 +69,40 @@
   opacity: 0.65;
 }
 
+.app-secondary-button,
+.app-secondary-link-button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-secondary-link-button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.app-secondary-button:hover:not(:disabled),
+.app-secondary-link-button:hover {
+  border-color: var(--color-text-muted);
+  background: var(--color-background);
+}
+
+.app-secondary-button:focus-visible,
+.app-secondary-link-button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.app-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .app-state {
   max-width: 760px;
   padding: 16px;
@@ -76,6 +116,12 @@
   border-color: color-mix(in srgb, var(--color-danger) 35%, white);
   background: var(--color-danger-soft);
   color: var(--color-danger);
+}
+
+.app-state-warning {
+  border-color: color-mix(in srgb, var(--color-warning) 35%, white);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
 }
 
 .app-link,
@@ -469,6 +515,129 @@
   color: var(--color-text-muted);
 }
 
+.recording-page-header {
+  max-width: 760px;
+}
+
+.recording-layout {
+  display: grid;
+  gap: 24px;
+}
+
+.recording-card {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.recording-card h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.recording-card > p {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.recording-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.recording-eyebrow {
+  margin: 0 0 8px;
+  color: var(--color-primary-hover);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.recording-status {
+  display: inline-flex;
+  margin: 0;
+  padding: 6px 10px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.recording-status-ready {
+  background: var(--color-background);
+  color: var(--color-text-muted);
+}
+
+.recording-status-sharing {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-hover);
+}
+
+.recording-status-recording {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.recording-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-danger);
+}
+
+.recording-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.recording-preview,
+.recording-result {
+  display: grid;
+  gap: 16px;
+}
+
+.recording-preview {
+  min-height: 280px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background);
+}
+
+.recording-preview p,
+.recording-empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.recording-preview video,
+.recording-result video {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  background: #000000;
+}
+
+.recording-result video {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.app-download-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 @media (hover: hover) {
   .employee-table tbody tr:hover {
     background: color-mix(in srgb, var(--color-primary-soft) 45%, white);
@@ -478,6 +647,8 @@
 @media (prefers-reduced-motion: reduce) {
   .app-add-button,
   .app-primary-button,
+  .app-secondary-button,
+  .app-secondary-link-button,
   .employee-form-actions button {
     transition: none;
   }
@@ -502,9 +673,16 @@
 
   .app-header,
   .employee-details-header,
+  .recording-card-header,
   .employee-form-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .app-header-actions,
+  .recording-actions {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .employee-form-grid {
@@ -521,6 +699,17 @@
 
   .app-primary-button {
     width: 100%;
+  }
+
+  .app-secondary-link-button,
+  .app-secondary-button,
+  .app-download-link {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .recording-preview {
+    min-height: 180px;
   }
 
   .employee-details-list div {

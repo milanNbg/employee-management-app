@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { EmployeeFormDialog } from '../components/EmployeeFormDialog'
 import { EmployeeTable } from '../components/EmployeeTable'
 import { useCreateEmployee } from '../hooks/useCreateEmployee'
@@ -48,14 +49,19 @@ export function EmployeesPage() {
           <h1 id="page-title">Employee Management</h1>
           <p>Manage employees and record screen walkthroughs.</p>
         </div>
-        <button
-          className="app-add-button"
-          type="button"
-          disabled={isSubmitting || isEmployeeFormVisible}
-          onClick={showEmployeeForm}
-        >
-          Add employee
-        </button>
+        <div className="app-header-actions">
+          <Link className="app-secondary-link-button" to="/recording">
+            Screen recorder
+          </Link>
+          <button
+            className="app-add-button"
+            type="button"
+            disabled={isSubmitting || isEmployeeFormVisible}
+            onClick={showEmployeeForm}
+          >
+            Add employee
+          </button>
+        </div>
       </section>
 
       {isEmployeeFormVisible && (
