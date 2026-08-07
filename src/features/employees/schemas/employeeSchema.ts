@@ -33,6 +33,14 @@ export const createEmployeeFormSchema = z.object({
   salary: salarySchema,
 })
 
+export const updateEmployeeSalaryFormSchema = z.object({
+  salary: salarySchema,
+})
+
 export type CreateEmployeeFormValues = z.infer<
   typeof createEmployeeFormSchema
+>
+
+export type UpdateEmployeeSalaryFormValues = z.infer<
+  typeof updateEmployeeSalaryFormSchema
 >

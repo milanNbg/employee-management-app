@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ApiError } from '../../../lib/apiClient'
 import { getEmployeeById } from '../api/employeeApi'
 import type { Employee } from '../types/employee'
@@ -8,6 +8,7 @@ interface UseEmployeeResult {
   isLoading: boolean
   error: string | null
   isNotFound: boolean
+  updateEmployee: (updatedEmployee: Employee) => void
 }
 
 function isAbortError(error: unknown): boolean {
@@ -37,6 +38,14 @@ export function useEmployee(
   const [error, setError] = useState<string | null>(null)
   const [isNotFound, setIsNotFound] = useState(false)
   const [loadedEmployeeId, setLoadedEmployeeId] = useState<string | null>(null)
+
+  const updateEmployee = useCallback((updatedEmployee: Employee) => {
+    setEmployee(updatedEmployee)
+    setError(null)
+    setIsNotFound(false)
+    setIsLoading(false)
+    setLoadedEmployeeId(updatedEmployee.id)
+  }, [])
 
   useEffect(() => {
     if (!employeeId) {
@@ -88,6 +97,7 @@ export function useEmployee(
       isLoading: false,
       error: 'Employee id is missing.',
       isNotFound: false,
+      updateEmployee,
     }
   }
 
@@ -98,5 +108,6 @@ export function useEmployee(
     isLoading: hasLoadedCurrentEmployee ? isLoading : true,
     error: hasLoadedCurrentEmployee ? error : null,
     isNotFound: hasLoadedCurrentEmployee ? isNotFound : false,
+    updateEmployee,
   }
 }

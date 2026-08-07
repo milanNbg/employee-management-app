@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { useParams } from 'react-router'
 import { BackToEmployeesLink } from '../../../components/BackToEmployeesLink'
+import { SalaryUpdateDialog } from '../components/SalaryUpdateDialog'
+import { useUpdateEmployeeSalary } from '../hooks/useUpdateEmployeeSalary'
 import {
   formatDate,
   formatEmployeeName,
@@ -7,6 +10,7 @@ import {
   formatTime,
 } from '../utils/employeeFormatters'
 import { useEmployee } from '../hooks/useEmployee'
+import type { UpdateEmployeeSalaryFormValues } from '../schemas/employeeSchema'
 
 function renderDateTime(date: string) {
   return (
@@ -19,7 +23,46 @@ function renderDateTime(date: string) {
 
 export function EmployeeDetailsPage() {
   const { employeeId } = useParams()
-  const { employee, isLoading, error, isNotFound } = useEmployee(employeeId)
+  const {
+    employee,
+    isLoading,
+    error,
+    isNotFound,
+    updateEmployee,
+  } = useEmployee(employeeId)
+  const [isSalaryDialogVisible, setIsSalaryDialogVisible] = useState(false)
+  const {
+    submitSalaryUpdate,
+    isSubmitting: isSalarySubmitting,
+    error: salaryUpdateError,
+    clearError: clearSalaryUpdateError,
+  } = useUpdateEmployeeSalary()
+
+  const showSalaryUpdateDialog = () => {
+    clearSalaryUpdateError()
+    setIsSalaryDialogVisible(true)
+  }
+
+  const closeSalaryUpdateDialog = () => {
+    if (isSalarySubmitting) {
+      return
+    }
+
+    clearSalaryUpdateError()
+    setIsSalaryDialogVisible(false)
+  }
+
+  const handleSalaryUpdate = async (
+    values: UpdateEmployeeSalaryFormValues,
+  ) => {
+    if (!employee || isSalarySubmitting) {
+      return
+    }
+
+    const updatedEmployee = await submitSalaryUpdate(employee.id, values)
+    updateEmployee(updatedEmployee)
+    closeSalaryUpdateDialog()
+  }
 
   return (
     <main className="app">
@@ -60,8 +103,18 @@ export function EmployeeDetailsPage() {
       {!isLoading && !error && !isNotFound && employee && (
         <article className="employee-details-card">
           <header className="employee-details-header">
-            <p>Employee profile</p>
-            <h1>{formatEmployeeName(employee)}</h1>
+            <div>
+              <p>Employee profile</p>
+              <h1>{formatEmployeeName(employee)}</h1>
+            </div>
+            <button
+              className="app-primary-button"
+              type="button"
+              disabled={isSalarySubmitting || isSalaryDialogVisible}
+              onClick={showSalaryUpdateDialog}
+            >
+              Update salary
+            </button>
           </header>
 
           <dl className="employee-details-list">
@@ -78,6 +131,16 @@ export function EmployeeDetailsPage() {
               <dd>{renderDateTime(employee.updatedAt)}</dd>
             </div>
           </dl>
+
+          {isSalaryDialogVisible && (
+            <SalaryUpdateDialog
+              currentSalary={employee.salary}
+              onSubmit={handleSalaryUpdate}
+              onClose={closeSalaryUpdateDialog}
+              isSubmitting={isSalarySubmitting}
+              submissionError={salaryUpdateError}
+            />
+          )}
         </article>
       )}
     </main>
