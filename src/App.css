@@ -645,6 +645,10 @@
   max-width: 720px;
 }
 
+.employee-not-found-card .employee-details-header {
+  justify-content: flex-start;
+}
+
 .employee-not-found-content {
   display: grid;
   gap: 18px;
