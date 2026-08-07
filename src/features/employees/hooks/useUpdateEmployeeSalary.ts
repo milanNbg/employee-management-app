@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { ApiError } from '../../../lib/apiClient'
 import { updateEmployeeSalary } from '../api/employeeApi'
 import type { Employee, UpdateEmployeeSalaryInput } from '../types/employee'
 
@@ -6,18 +7,10 @@ interface UseUpdateEmployeeSalaryResult {
   submitSalaryUpdate: (
     employeeId: string,
     input: UpdateEmployeeSalaryInput,
-  ) => Promise<Employee>
+  ) => Promise<Employee | null>
   isSubmitting: boolean
   error: string | null
   clearError: () => void
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  return 'Unable to update salary.'
 }
 
 export function useUpdateEmployeeSalary(): UseUpdateEmployeeSalaryResult {
@@ -32,9 +25,9 @@ export function useUpdateEmployeeSalary(): UseUpdateEmployeeSalaryResult {
   const submitSalaryUpdate = async (
     employeeId: string,
     input: UpdateEmployeeSalaryInput,
-  ): Promise<Employee> => {
+  ): Promise<Employee | null> => {
     if (isSubmittingRef.current) {
-      throw new Error('Salary update is already in progress.')
+      return null
     }
 
     isSubmittingRef.current = true
@@ -44,8 +37,11 @@ export function useUpdateEmployeeSalary(): UseUpdateEmployeeSalaryResult {
     try {
       return await updateEmployeeSalary(employeeId, input)
     } catch (submitError) {
-      const message = getErrorMessage(submitError)
-      setError(message)
+      if (submitError instanceof ApiError) {
+        setError(submitError.message)
+        return null
+      }
+
       throw submitError
     } finally {
       isSubmittingRef.current = false

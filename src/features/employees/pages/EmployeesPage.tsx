@@ -37,7 +37,12 @@ export function EmployeesPage() {
       return
     }
 
-    await submitEmployee(values)
+    const createdEmployee = await submitEmployee(values)
+
+    if (!createdEmployee) {
+      return
+    }
+
     await refreshEmployees()
     closeEmployeeForm()
   }
@@ -80,9 +85,25 @@ export function EmployeesPage() {
       )}
 
       {!isLoading && error && (
-        <p className="app-state app-state-error" role="alert">
-          {error}
-        </p>
+        <section
+          className="app-state app-state-error app-load-error"
+          role="alert"
+          aria-labelledby="employee-load-error-title"
+        >
+          <div>
+            <h2 id="employee-load-error-title">Unable to load employees</h2>
+            <p>{error}</p>
+          </div>
+          <button
+            className="app-secondary-button"
+            type="button"
+            onClick={() => {
+              void refreshEmployees()
+            }}
+          >
+            Retry
+          </button>
+        </section>
       )}
 
       {!isLoading && !error && employees.length === 0 && (

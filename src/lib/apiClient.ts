@@ -55,7 +55,19 @@ async function parseJsonResponse(response: Response): Promise<unknown> {
     return undefined
   }
 
-  return JSON.parse(text)
+  try {
+    return JSON.parse(text)
+  } catch (error) {
+    if (response.ok) {
+      throw error
+    }
+
+    return undefined
+  }
+}
+
+function isServiceUnavailableStatus(status: number): boolean {
+  return status === 502 || status === 503 || status === 504
 }
 
 export async function apiRequest<T>(
@@ -79,9 +91,15 @@ export async function apiRequest<T>(
 
     if (!response.ok) {
       const errorResponse = parseApiErrorResponse(responseData)
-      const code = errorResponse.error?.code ?? 'API_ERROR'
+      const isServiceUnavailable = isServiceUnavailableStatus(response.status)
+      const code =
+        errorResponse.error?.code ??
+        (isServiceUnavailable ? 'SERVICE_UNAVAILABLE' : 'API_ERROR')
       const message =
         errorResponse.error?.message ||
+        (isServiceUnavailable
+          ? 'The service is temporarily unavailable. Please try again.'
+          : undefined) ||
         response.statusText ||
         'The API request failed.'
 
@@ -106,7 +124,7 @@ export async function apiRequest<T>(
     throw new ApiError(
       0,
       'NETWORK_ERROR',
-      'Unable to connect to the API.',
+      'Unable to connect to the server. Please try again.',
       error,
     )
   }

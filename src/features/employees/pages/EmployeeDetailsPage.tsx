@@ -60,6 +60,11 @@ export function EmployeeDetailsPage() {
     }
 
     const updatedEmployee = await submitSalaryUpdate(employee.id, values)
+
+    if (!updatedEmployee) {
+      return
+    }
+
     updateEmployee(updatedEmployee)
     closeSalaryUpdateDialog()
   }

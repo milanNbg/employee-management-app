@@ -124,6 +124,23 @@
   color: var(--color-warning);
 }
 
+.app-load-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-load-error h2 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+
+.app-load-error p {
+  margin: 0;
+}
+
 .app-link,
 .app-link:visited,
 .employee-name-link {
@@ -674,6 +691,7 @@
   .app-header,
   .employee-details-header,
   .recording-card-header,
+  .app-load-error,
   .employee-form-actions {
     flex-direction: column;
     align-items: stretch;
