@@ -1,4 +1,4 @@
-import { BackToEmployeesLink } from './BackToEmployeesLink'
+import { BackToEmployeesLink } from '../components/BackToEmployeesLink'
 
 export function NotFoundPage() {
   return (

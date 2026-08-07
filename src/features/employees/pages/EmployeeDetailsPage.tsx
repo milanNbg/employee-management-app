@@ -1,24 +1,20 @@
 import { useState } from 'react'
 import { useParams } from 'react-router'
 import { BackToEmployeesLink } from '../../../components/BackToEmployeesLink'
+import { Toast } from '../../../components/Toast'
+import { EmployeeDateTime } from '../components/EmployeeDateTime'
 import { SalaryUpdateDialog } from '../components/SalaryUpdateDialog'
 import { useUpdateEmployeeSalary } from '../hooks/useUpdateEmployeeSalary'
 import {
-  formatDate,
   formatEmployeeName,
   formatSalary,
-  formatTime,
 } from '../utils/employeeFormatters'
 import { useEmployee } from '../hooks/useEmployee'
 import type { UpdateEmployeeSalaryFormValues } from '../schemas/employeeSchema'
 
-function renderDateTime(date: string) {
-  return (
-    <span className="employee-date-time">
-      <span>{formatDate(date)}</span>
-      <span>{formatTime(date)}</span>
-    </span>
-  )
+interface SuccessToast {
+  id: number
+  message: string
 }
 
 export function EmployeeDetailsPage() {
@@ -31,6 +27,7 @@ export function EmployeeDetailsPage() {
     updateEmployee,
   } = useEmployee(employeeId)
   const [isSalaryDialogVisible, setIsSalaryDialogVisible] = useState(false)
+  const [successToast, setSuccessToast] = useState<SuccessToast | null>(null)
   const {
     submitSalaryUpdate,
     isSubmitting: isSalarySubmitting,
@@ -67,6 +64,10 @@ export function EmployeeDetailsPage() {
 
     updateEmployee(updatedEmployee)
     closeSalaryUpdateDialog()
+    setSuccessToast({
+      id: Date.now(),
+      message: 'Salary updated successfully.',
+    })
   }
 
   return (
@@ -74,6 +75,16 @@ export function EmployeeDetailsPage() {
       <div className="app-page-nav">
         <BackToEmployeesLink />
       </div>
+
+      {successToast && (
+        <Toast
+          key={successToast.id}
+          message={successToast.message}
+          onClose={() => {
+            setSuccessToast(null)
+          }}
+        />
+      )}
 
       {isLoading && (
         <p className="app-state" role="status" aria-live="polite">
@@ -129,11 +140,15 @@ export function EmployeeDetailsPage() {
             </div>
             <div>
               <dt>Created</dt>
-              <dd>{renderDateTime(employee.createdAt)}</dd>
+              <dd>
+                <EmployeeDateTime date={employee.createdAt} />
+              </dd>
             </div>
             <div>
               <dt>Last updated</dt>
-              <dd>{renderDateTime(employee.updatedAt)}</dd>
+              <dd>
+                <EmployeeDateTime date={employee.updatedAt} />
+              </dd>
             </div>
           </dl>
 

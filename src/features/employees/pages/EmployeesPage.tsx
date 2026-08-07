@@ -1,13 +1,20 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { Toast } from '../../../components/Toast'
 import { EmployeeFormDialog } from '../components/EmployeeFormDialog'
-import { EmployeeTable } from '../components/EmployeeTable'
+import { EmployeeList } from '../components/EmployeeList'
 import { useCreateEmployee } from '../hooks/useCreateEmployee'
 import { useEmployees } from '../hooks/useEmployees'
 import type { CreateEmployeeFormValues } from '../schemas/employeeSchema'
 
+interface SuccessToast {
+  id: number
+  message: string
+}
+
 export function EmployeesPage() {
   const [isEmployeeFormVisible, setIsEmployeeFormVisible] = useState(false)
+  const [successToast, setSuccessToast] = useState<SuccessToast | null>(null)
   const { employees, isLoading, error, refreshEmployees } = useEmployees()
   const {
     submitEmployee,
@@ -45,6 +52,10 @@ export function EmployeesPage() {
 
     await refreshEmployees()
     closeEmployeeForm()
+    setSuccessToast({
+      id: Date.now(),
+      message: 'Employee added successfully.',
+    })
   }
 
   return (
@@ -75,6 +86,16 @@ export function EmployeesPage() {
           onClose={closeEmployeeForm}
           isSubmitting={isSubmitting}
           submissionError={createEmployeeError}
+        />
+      )}
+
+      {successToast && (
+        <Toast
+          key={successToast.id}
+          message={successToast.message}
+          onClose={() => {
+            setSuccessToast(null)
+          }}
         />
       )}
 
@@ -111,7 +132,7 @@ export function EmployeesPage() {
       )}
 
       {!isLoading && !error && employees.length > 0 && (
-        <EmployeeTable employees={employees} />
+        <EmployeeList employees={employees} />
       )}
     </main>
   )

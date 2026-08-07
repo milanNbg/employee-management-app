@@ -1,9 +1,9 @@
 import './App.css'
 import { Navigate, Route, Routes } from 'react-router'
-import { NotFoundPage } from './components/NotFoundPage'
 import { EmployeeDetailsPage } from './features/employees/pages/EmployeeDetailsPage'
 import { EmployeesPage } from './features/employees/pages/EmployeesPage'
 import { RecordingPage } from './features/recording/pages/RecordingPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 
 export function App() {
   return (
